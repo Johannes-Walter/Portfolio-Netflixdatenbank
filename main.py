@@ -35,7 +35,10 @@ with open("netflix_titles.csv", encoding="UTF-8") as file:
 - Video aufnehmen/schneiden
     - 4MAT
     
-    
+
+WAS SOLL MAN DARSTELLEN KÖNNEN?
+WAS DAVON BRINGT ETWAS?
+
     
 DV:
 - Dashboard mit matplotlib/streamlit/excel
