@@ -1,9 +1,5 @@
-# -*- coding: utf-8 -*-
-
 import pandas as pd
 import sqlite3
-
-
 
 
 class db_connector:
@@ -43,6 +39,35 @@ class db_connector:
             rating STRING,
             duration STRING,
             description STRING)""")
+
+        cur.execute("DROP TABLE IF EXISTS [director]")
+        cur.execute("""CREATE TABLE [directors] (
+            name STRING PRIMARY KEY
+            )""")
+
+        cur.execute("DROP TABLE IF EXISTS [show_director]")
+        cur.execute("""CREATE TABLE [show_director] (
+            id INTEGER PRIMARY KEY,
+            show STRING NOT NULL
+            FOREIGN KEY (show) REFERENCES show (show_id)
+            director STRING NOT NULL
+            FOREGIN KEY (director) REFERENCES director (name)
+            )""")
+
+        cur.execute("DROP TABLE IF EXISTS [cast]")
+        cur.execute("""CREATE TABLE [cast](
+            name STRING PRIMARY KEY
+            )""")
+
+        cur.execute("DROP TABLE IF EXISTS [country]")
+        cur.execute("""CREATE TABLE [country](
+            name STRING PRIMARY KEY
+            )""")
+
+        cur.execute("DROP TABLE IF EXISTS [Listing]")
+        cur.execute("""CREATE TABLE [Listing](
+            name STRING PRIMARY KEY
+            )""")
         self.con.commit()
 
 
