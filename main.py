@@ -1,79 +1,75 @@
 # -*- coding: utf-8 -*-
 import csv
+
+import folium as folium
 import streamlit as st
+from streamlit_folium import folium_static
 import pandas as pd
 from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 import random
-st.sidebar.title("Auswahl der Variablen")
-st.sidebar.selectbox("Variable A", ["A", "B", "C"])
-st.sidebar.selectbox("Variable B", ["A", "B", "C"], index=1)
+import folium
 
-st.title("Willkommen auf unserem Dashboard")
+st.set_page_config(layout="wide")
+st.title("Netflix Dashboard")
 
-user_input1 = st.text_input("1. In welchen Filmen hat Schauspieler X gespielt? (Name des Schauspielers eingeben)")
+fragen=["1. In welchen Filmen hat Schauspieler X gespielt?",
+        "2. In welchen Filmen war X Regisseur?",
+        "3. Welche Filme sind in der Kategorie X?",
+        "4. Welche Filme sind zwischen Datum X und Y erschienen?"]
 
-if user_input1:
-    st.subheader(f"{user_input1} hat in folgenden Filmen mitgespielt:")
-    with st.spinner(text="This may take a moment..."):
+y = st.selectbox("Wähle aus", [fragen[0], fragen[1], fragen[2], fragen[3]])
+if y == fragen[0]:
+    z = st.text_input("Name des Schauspielers eingeben")
+    if z:
+        st.subheader(f"{z} hat in folgenden Filmen mitgespielt:")
         movies = ["King Kong", "Terminator 2", "UwU"]
-    st.write(movies)
-
-
-user_input2 = st.text_input("2. In welchen Filmen war X Regisseur? (Name des Regisseurs eingeben)")
-
-if user_input2:
-    st.subheader(f"{user_input2} hat bei folgenden Filmen Regie geführt:")
-    with st.spinner(text="This may take a moment..."):
+        st.write(movies)
+elif y == fragen[1]:
+    z = st.text_input("Name des Regisseurs eingeben")
+    if z:
+        st.subheader(f"{z} hat bei folgenden Filmen Regie geführt:")
         directors = random.sample(range(0, 10000), 4000)
-    st.write(directors)
+        st.write(directors)
+elif y == fragen[2]:
+    z = st.text_input("Bitte wählen Sie ein Genre aus (z.B. Action, Drama, etc...)")
+    if z:
+        st.subheader(f"Folgende Filme gehören zu dem Genre {z}:")
+        directors = random.sample(range(0, 10000), 4000)
+        st.write(directors)
+elif y == fragen[3]:
 
-user_input3 = st.text_input("3. Welche Filme sind in der Kategorie X (z.B. Action, Drama, etc...) ?")
+    z = st.slider("Bitte wählen Sie den Zeitraum aus:", 1925, 2021, (1970, 1980))
 
-if user_input3:
-    st.subheader(f"Folgende Filme sind in der Katerogie {user_input3}")
-    with st.spinner(text="This may take a moment..."):
-        categories = ["King Kong", "Terminator 2", "UwU"]
-    st.write(categories)
+    if z:
+        movies = random.sample(range(0, 10000), 4000)
+        movies = movies[z[0]:z[1]]
+        st.write(movies)
 
-st.text("4. Welche Filme sind zwischen Datum X und Y erschienen?")
+# geodata-source: https://geojson-maps.ash.ms/
+json1 = open(r'C:\Users\darke\PycharmProjects\Portfolio-Netflixdatenbank\custom_geo.json', 'r')
+m = folium.Map(location=[47.54, 7.58], tiles="CartoDB position", name="Light Map",
+               zoom_start=5, attr="Data Attribution")
+d = {'state_code': ["12", "134", "5"], 'Country': [1, 2, 3], 'Movies': ["2", "3", "4"], "Actors": ["1", "2", "19"]}
+df = pd.DataFrame(data=d)
+df = df.astype({col: int for col in df})
+choice = ["Country", "Movies", "Actors"]
+choice_selected = st.selectbox("Select choice", choice)
+folium.Choropleth(
+    geo_path=json1,
+    geo_data=r'C:\Users\darke\PycharmProjects\Portfolio-Netflixdatenbank\custom_geo.json',
+    name="choropleth",
+    data=df,
+    columns=["state_code", choice_selected],
+    key_on="feature.properties.name",
+    fill_color="YlOrRd",
+    fill_opacity=0.7,
+    line_opacity=0.1,
+    legend_name=choice_selected
+).add_to(m)
+folium.features.GeoJson(r'C:\Users\darke\PycharmProjects\Portfolio-Netflixdatenbank\custom_geo.json',
+                        name="Countries", popup=folium.features.GeoJsonPopup(fields=["name"])).add_to(m)
 
-x = st.slider("Zeitraum:", 1925, 2021, (1925, 2021))
-
-"""
-#TODO
-
-
-- Datenbank
-    - filtern
-    - speichern
-    - Suchmaske
-    - Rückgabetyp (Pandas?)
-
-- Kartendarstellung (Streamlit/eher Excel?)
-
-- UI mit Streamlit/Flask
-
-- Graphen (Interaktion mit UI)
-
-- Objektorientierung prüfen
-
-- Video aufnehmen/schneiden
-    - 4MAT
-
-
-WAS SOLL MAN DARSTELLEN KÖNNEN?
-WAS DAVON BRINGT ETWAS?
-- In wie vielen Filmen hat der Schauspieler mitgemacht?
-- Wie viele Filme pro Land gibt es? (Heatmap)
-- Wie viele Filme pro Einwohner?
-- Wie viele Saisons hat eine Serie im Schnitt?
-- Wie lang sind Filme aus USA im Schnitt im Gegensatz zu Indien? (Boxplot mit min,avg,max)
-- Wie viel Schauspieler gibt es im Durchschnitt in einer Serie?
+folium_static(m, width=1600, height=950)
 
 
-DV:
-- Dashboard mit matplotlib/streamlit/excel
-
-
-"""
