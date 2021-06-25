@@ -15,11 +15,9 @@ class db_connector:
         self.con.close()
 
     def read_file(self, file_path: str):
-        # In UTF-8 öffnen, weil Sonderzeichen
         cur = self.con.cursor()
-        T = True
-        F = False
 
+        # In UTF-8 öffnen, weil Sonderzeichen
         data = pd.read_csv(file_path, encoding="UTF-8")
 
         # Zeilenumbrüche Löschen, um aufzuräumen
