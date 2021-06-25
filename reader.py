@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import sqlite3
 
 
@@ -10,19 +11,32 @@ class db_connector:
     def __del__(self):
         self.con.close()
 
-    def read_file(self, file_path: str):
+    def import_file(self, file_path: str):
         cur = self.con.cursor()
 
         # In UTF-8 öffnen, weil Sonderzeichen
-        data = pd.read_csv(file_path, encoding="UTF-8")
+        data = pd.read_csv(file_path, encoding="UTF-8", dtype={"director":str})
 
         # Zeilenumbrüche Löschen, um aufzuräumen
         data = data.replace("\\n", " ", regex=True)
+        data = data.replace(np.nan, "", regex=True)
 
-        cur.executemany(
-            """INSERT INTO [shows] (show_id, type, title, date_added, release_year, rating, duration, description)
+
+        cur.executemany("""
+            INSERT INTO [shows] (show_id, type, title, date_added, release_year, rating, duration, description)
             values(?, ?, ?, ?, ?, ?, ?, ?)""",
             data.loc[:, ["show_id", "type", "title", "date_added", "release_year", "rating", "duration", "description"]].values.tolist())
+
+        for iter, row in data.iterrows():
+            if row["director"] != "":
+                for director in str.split(row["director"], ","):
+                    cur.execute("INSERT OR IGNORE INTO [director] (name) values(?)",
+                                [director])
+                    cur.execute("""
+                        INSERT INTO [show_director] (show_id, director)
+                        VALUES (?, ?)""",
+                        (row["show_id"], director))
+
 
         self.con.commit()
         return
@@ -32,31 +46,40 @@ class db_connector:
         cur.execute("DROP TABLE IF EXISTS [shows]")
         cur.execute("""CREATE TABLE [shows] (
             show_id STRING PRIMARY KEY,
-            type STRNG,
+            type STRING,
             title STRING,
             date_added STRING,
-            release_year INT,
+            release_year INTEGER,
             rating STRING,
             duration STRING,
             description STRING)""")
 
         cur.execute("DROP TABLE IF EXISTS [director]")
-        cur.execute("""CREATE TABLE [directors] (
+        cur.execute("""CREATE TABLE [director] (
             name STRING PRIMARY KEY
             )""")
 
         cur.execute("DROP TABLE IF EXISTS [show_director]")
         cur.execute("""CREATE TABLE [show_director] (
             id INTEGER PRIMARY KEY,
-            show STRING NOT NULL
-            FOREIGN KEY (show) REFERENCES show (show_id)
-            director STRING NOT NULL
-            FOREGIN KEY (director) REFERENCES director (name)
+            show_id STRING NOT NULL,
+            director STRING NOT NULL,
+            FOREIGN KEY (show_id) REFERENCES show (show_id),
+            FOREIGN KEY (director) REFERENCES director (name)
             )""")
 
         cur.execute("DROP TABLE IF EXISTS [cast]")
-        cur.execute("""CREATE TABLE [cast](
+        cur.execute("""CREATE TABLE [cast] (
             name STRING PRIMARY KEY
+            )""")
+
+        cur.execute("DROP TABLE IF EXISTS [show_cast]")
+        cur.execute("""CREATE TABLE [show_cast] (
+            id INTEGER PRIMARY KEY,
+            show_id STRING NOT NULL,
+            cast STRING NOT NULL,
+            FOREIGN KEY (show_id) REFERENCES [show] (show_id),
+            FOREIGN KEY (cast) REFERENCES [cast] (name)
             )""")
 
         cur.execute("DROP TABLE IF EXISTS [country]")
@@ -64,16 +87,34 @@ class db_connector:
             name STRING PRIMARY KEY
             )""")
 
-        cur.execute("DROP TABLE IF EXISTS [Listing]")
-        cur.execute("""CREATE TABLE [Listing](
+        cur.execute("DROP TABLE IF EXISTS [show_country]")
+        cur.execute("""CREATE TABLE [show_country] (
+            id INTEGER PRIMARY KEY,
+            show_id STRING NOT NULL,
+            country STRING NOT NULL,
+            FOREIGN KEY (show_id) REFERENCES [show] (show_id),
+            FOREIGN KEY (country) REFERENCES [country] (name)
+            )""")
+
+        cur.execute("DROP TABLE IF EXISTS [listing]")
+        cur.execute("""CREATE TABLE [listing](
             name STRING PRIMARY KEY
             )""")
+
+        cur.execute("DROP TABLE IF EXISTS [show_listing]")
+        cur.execute("""CREATE TABLE [show_listing] (
+            id INTEGER PRIMARY KEY,
+            show_id STRING NOT NULL,
+            listing STRING NOT NULL,
+            FOREIGN KEY (show_id) REFERENCES [show] (show_id),
+            FOREIGN KEY (listing) REFERENCES [listing] (name)
+            )""")
+
         self.con.commit()
 
 
 if __name__ == "__main__":
-    #test = data.loc[:,["show_id", "type", "title", "date_added", "release_year", "rating", "duration", "description"]].values.tolist()
     con = db_connector("database")
     con.reset_database()
-    con.read_file("netflix_titles.csv")
+    con.import_file("netflix_titles.csv")
     con.con.close()
