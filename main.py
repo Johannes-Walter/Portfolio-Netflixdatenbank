@@ -49,7 +49,7 @@ x = st.slider("Zeitraum:", 1925, 2021, (1925, 2021))
     - speichern
     - Suchmaske
     - Rückgabetyp (Pandas?)
-    
+
 - Kartendarstellung (Streamlit/eher Excel?)
 
 - UI mit Streamlit/Flask
@@ -60,7 +60,7 @@ x = st.slider("Zeitraum:", 1925, 2021, (1925, 2021))
 
 - Video aufnehmen/schneiden
     - 4MAT
-    
+
 
 WAS SOLL MAN DARSTELLEN KÖNNEN?
 WAS DAVON BRINGT ETWAS?
@@ -71,7 +71,7 @@ WAS DAVON BRINGT ETWAS?
 - Wie lang sind Filme aus USA im Schnitt im Gegensatz zu Indien? (Boxplot mit min,avg,max)
 - Wie viel Schauspieler gibt es im Durchschnitt in einer Serie?
 
-    
+
 DV:
 - Dashboard mit matplotlib/streamlit/excel
 
