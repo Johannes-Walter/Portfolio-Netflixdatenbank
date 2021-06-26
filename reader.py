@@ -432,7 +432,9 @@ class db_connector:
 # TODO
 # - ,,gesäuberte" CSV exportieren
 # - Dokumentation
-# - 2x Video 
+# - 2x Video + Upload
+# - README fertigstellen
+# - Streamlit-Application deployen
 #
 # Optional:
 # - OOP
