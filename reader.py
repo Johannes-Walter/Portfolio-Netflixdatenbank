@@ -148,6 +148,7 @@ class db_connector:
 
         self.con.commit()
 
+# Welche Schauspieler gibt es bei Netflix-Filmen?
     def get_all_cast(self):
         cur = self.con.cursor()
         cur.execute("""SELECT c.name
@@ -155,6 +156,7 @@ class db_connector:
                     """)
         return pd.DataFrame(cur.fetchall(), columns=("cast",))
 
+# Welche Kategorien gibt es auf Netflix?
     def get_all_listings(self):
         cur = self.con.cursor()
         cur.execute("""SELECT l.name
@@ -162,6 +164,7 @@ class db_connector:
                     """)
         return pd.DataFrame(cur.fetchall(), columns=("listed_in",))
 
+# Welche Regisseure gibt es bei Netflix-Filmen?
     def get_all_directors(self):
         cur = self.con.cursor()
         cur.execute("""
@@ -170,6 +173,7 @@ class db_connector:
                     """)
         return pd.DataFrame(cur.fetchall(), columns=("director",))
 
+# Welche Filme gibt es auf Netflix?
     def get_all_shows(self):
         cur = self.con.cursor()
         cur.execute(f"""
@@ -178,6 +182,7 @@ class db_connector:
                     """)
         return pd.DataFrame(cur.fetchall(), columns=self.SHOW_COLUMNS)
 
+# In welchen Ländern wurden Filme produziert?
     def get_all_countries(self):
         cur = self.con.cursor()
         cur.execute("""
@@ -186,6 +191,7 @@ class db_connector:
                     """)
         return pd.DataFrame(cur.fetchall(), columns=("country",))
 
+# Welche Filme sind vom Regisseur X?
     def get_shows_by_director(self, director: str):
         cur = self.con.cursor()
         cur.execute(f"""
@@ -198,6 +204,7 @@ class db_connector:
                     (director,))
         return pd.DataFrame(cur.fetchall(), columns=self.SHOW_COLUMNS)
 
+# In welchen Filmen hat Schauspieler X gespielt?
     def get_shows_by_cast(self, cast: str):
         cur = self.con.cursor()
         cur.execute(f"""
@@ -210,6 +217,7 @@ class db_connector:
                     (cast,))
         return pd.DataFrame(cur.fetchall(), columns=self.SHOW_COLUMNS)
 
+# Welche Filme sind in der Kategorie X?
     def get_shows_by_listing(self, listing: str):
         cur = self.con.cursor()
         cur.execute(f"""
@@ -222,6 +230,7 @@ class db_connector:
                     (listing,))
         return pd.DataFrame(cur.fetchall(), columns=self.SHOW_COLUMNS)
 
+# Welche Filme sind aus Land X?
     def get_shows_by_country(self, country: str):
         cur = self.con.cursor()
         cur.execute(f"""
@@ -234,6 +243,7 @@ class db_connector:
                     (country,))
         return pd.DataFrame(cur.fetchall(), columns=self.SHOW_COLUMNS)
 
+# Wie viele Filme sind aus Land X?
     def get_shows_per_country(self):
         cur = self.con.cursor()
         cur.execute("""
@@ -244,6 +254,7 @@ class db_connector:
                     """)
         return pd.DataFrame(cur.fetchall(), columns=["country", "count"])
 
+#  An welchen Orten wurde Film X gedreht?
     def get_countries_by_show(self, show: str):
         cur = self.con.cursor()
         cur.execute("""
@@ -256,6 +267,7 @@ class db_connector:
                     (show,))
         return pd.DataFrame(cur.fetchall(), columns=("country",))
 
+#1. In welchen Filmen war X ein Regisseur?
     def get_directors_by_show(self, show: str):
         cur = self.con.cursor()
         cur.execute("""
@@ -268,6 +280,7 @@ class db_connector:
                     (show,))
         return pd.DataFrame(cur.fetchall(), columns=("director",))
 
+# In welchen Filmen war X ein Schauspieler?
     def get_cast_by_show(self, show: str):
         cur = self.con.cursor()
         cur.execute("""
@@ -280,6 +293,7 @@ class db_connector:
                     (show,))
         return pd.DataFrame(cur.fetchall(), columns=("cast",))
 
+# In welchen Kategorien ist Film X?
     def get_listings_by_show(self, show: str):
         cur = self.con.cursor()
         cur.execute("""
@@ -292,6 +306,7 @@ class db_connector:
                     (show,))
         return pd.DataFrame(cur.fetchall(), columns=("listings",))
 
+# In welchen Kategorien ist X ein Regisseur? 
     def get_listings_by_director(self, director: str):
         cur = self.con.cursor()
         cur.execute("""
@@ -306,6 +321,7 @@ class db_connector:
                     (director,))
         return pd.DataFrame(cur.fetchall(), columns=("listing",))
 
+# In welchen Kategorien ist X ein Schauspieler?
     def get_listings_by_cast(self, cast: str):
         cur = self.con.cursor()
         cur.execute("""
@@ -320,6 +336,7 @@ class db_connector:
                     (cast,))
         return pd.DataFrame(cur.fetchall(), columns=("listing",))
 
+# Welcher Schauspieler spielte bei Filmen des Regisseures X mit?
     def get_cast_by_director(self, director: str):
         cur = self.con.cursor()
         cur.execute("""
@@ -334,6 +351,7 @@ class db_connector:
                     (director,))
         return pd.DataFrame(cur.fetchall(), columns=("cast",))
 
+# Wer war Regie bei Filmen, bei denen Schauspieler X mitspielte?
     def get_directors_by_cast(self, cast: str):
         cur = self.con.cursor()
         cur.execute("""
@@ -348,6 +366,7 @@ class db_connector:
                     (cast,))
         return pd.DataFrame(cur.fetchall(), columns=("director",))
 
+# In welchen Ländern war X Regisseur?
     def get_country_by_director(self, director: str):
         cur = self.con.cursor()
         cur.execute("""
@@ -362,6 +381,7 @@ class db_connector:
                     (director,))
         return pd.DataFrame(cur.fetchall(), columns=("country",))
 
+# Welche Regisseure waren in Land X?
     def get_director_by_country(self, country: str):
         cur = self.con.cursor()
         cur.execute("""
@@ -376,6 +396,7 @@ class db_connector:
                     (country,))
         return pd.DataFrame(cur.fetchall(), columns=("country",))
 
+# In welchen Ländern war X Schauspieler?
     def get_country_by_cast(self, cast: str):
         cur = self.con.cursor()
         cur.execute("""
@@ -390,6 +411,7 @@ class db_connector:
                     (cast,))
         return pd.DataFrame(cur.fetchall(), columns=("country",))
 
+# Welche Schauspieler waren in Land X?
     def get_cast_by_country(self, country: str):
         pass
 
