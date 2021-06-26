@@ -5,7 +5,7 @@ import sqlite3
 
 class db_connector:
 
-    def __init__(self, db_path):
+    def __init__(self, db_path = "database"):
         self.con = sqlite3.connect(db_path)
 
     def __del__(self):
@@ -164,7 +164,7 @@ class db_connector:
         pass
 
 if __name__ == "__main__":
-    con = db_connector("database")
+    con = db_connector()
     con.reset_database()
     con.import_file("netflix_titles.csv")
     con.con.close()
