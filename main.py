@@ -18,7 +18,6 @@ st.title("Netflix Dashboard")
 con = reader.db_connector()
 con.reset_database()
 con.import_file("netflix_titles.csv")
-con.con.close()
 
 fragen=["1. In welchen Filmen hat Schauspieler X gespielt?",
         "2. In welchen Filmen war X Regisseur?",
