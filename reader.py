@@ -32,31 +32,46 @@ class db_connector:
         data = data.replace("\\n", " ", regex=True)
         data = data.replace(np.nan, "", regex=True)
 
-
-        cur.executemany("""
-            INSERT INTO [shows] (show_id, type, title, date_added, release_year, rating, duration, description)
+        cur.executemany(f"""
+            INSERT INTO [shows] ({", ".join(self.SHOW_COLUMNS)})
             values(?, ?, ?, ?, ?, ?, ?, ?)""",
             data.loc[:, self.SHOW_COLUMNS].values.tolist())
 
         for iter, row in data.iterrows():
-            if row["director"] != "":
-                for director in str.split(row["director"], ","):
-                    director = director.strip()
-                    cur.execute("INSERT OR IGNORE INTO [director] (name) values(?)",
-                                (director,))
-                    cur.execute("SELECT id FROM [director] WHERE name = ?",
-                                (director,))
-                    cur.execute("""
-                        INSERT INTO [show_director] (show_id, director_id)
-                        VALUES (?, ?)""",
-                        (row["show_id"], cur.fetchone()[0]))
-
-            if row["cast"] != "":
-                for director in str.split(row["cast"], ","):
-                    pass
+            self.__insert_relational_row(show_id=row["show_id"],
+                                         data_name="director",
+                                         data=row["director"])
+            self.__insert_relational_row(show_id=row["show_id"],
+                                         data_name="cast",
+                                         data=row["cast"])
+            self.__insert_relational_row(show_id=row["show_id"],
+                                         data_name="country",
+                                         data=row["country"])
+            self.__insert_relational_row(show_id=row["show_id"],
+                                         data_name="listing",
+                                         data=row["listed_in"])
 
         self.con.commit()
         return
+
+    def __insert_relational_row(self, show_id, data_name, data):
+        cur = self.con.cursor()
+
+        for value in str.split(data, ","):
+            value = value.strip()
+            # insert data in data-table
+            cur.execute(f"""INSERT OR IGNORE INTO [{data_name}] (name)
+                        values (?)""",
+                        (value,))
+
+            # Fetch data-id
+            cur.execute(f"SELECT id FROM [{data_name}] WHERE name = ?",
+                        (value,))
+
+            cur.execute(f"""
+                        INSERT INTO [show_{data_name}] (show_id, {data_name}_id)
+                        VALUES (?, ?)""",
+                        (show_id, cur.fetchone()[0]))
 
     def reset_database(self):
         cur = self.con.cursor()
@@ -133,12 +148,43 @@ class db_connector:
 
         self.con.commit()
 
-
     def get_all_cast(self):
-        pass
+        cur = self.con.cursor()
+        cur.execute("""SELECT c.name
+                    FROM [cast] as c
+                    """)
+        return pd.DataFrame(cur.fetchall(), columns=("cast",))
 
     def get_all_listings(self):
-        pass
+        cur = self.con.cursor()
+        cur.execute("""SELECT l.name
+                    FROM [listing] as l
+                    """)
+        return pd.DataFrame(cur.fetchall(), columns=("listed_in",))
+
+    def get_all_directors(self):
+        cur = self.con.cursor()
+        cur.execute("""
+                    SELECT d.name
+                    FROM [director] as d
+                    """)
+        return pd.DataFrame(cur.fetchall(), columns=("director",))
+
+    def get_all_shows(self):
+        cur = self.con.cursor()
+        cur.execute(f"""
+                    SELECT {', '.join(self.SHOW_COLUMNS)}
+                    FROM [shows]
+                    """)
+        return pd.DataFrame(cur.fetchall(), columns=self.SHOW_COLUMNS)
+
+    def get_all_countries(self):
+        cur = self.con.cursor()
+        cur.execute("""
+                    SELECT c.name
+                    FROM [country] as c
+                    """)
+        return pd.DataFrame(cur.fetchall(), columns=("country",))
 
     def get_shows_by_director(self, director: str):
         cur = self.con.cursor()
@@ -163,22 +209,6 @@ class db_connector:
                     """,
                     (show,))
         return pd.DataFrame(cur.fetchall(), columns=("director",))
-
-    def get_all_directors(self):
-        cur = self.con.cursor()
-        cur.execute("""
-                    SELECT d.name
-                    FROM [director] as d
-                    """)
-        return pd.DataFrame(cur.fetchall(), columns=("director",))
-
-    def get_all_shows(self):
-        cur = self.con.cursor()
-        cur.execute(f"""
-                    SELECT {', '.join(self.SHOW_COLUMNS)}
-                    FROM [shows]
-                    """)
-        return pd.DataFrame(cur.fetchall(), columns=self.SHOW_COLUMNS)
 
     def get_shows_by_cast(self, cast: str):
         pass
@@ -215,7 +245,7 @@ class db_connector:
 
 if __name__ == "__main__":
     con = db_connector()
-    con.reset_database()
-    con.import_file("netflix_titles.csv")
+    # con.reset_database()
+    # con.import_file("netflix_titles.csv")
     data = con.get_shows_by_director("George Ford")
     con.con.close()
