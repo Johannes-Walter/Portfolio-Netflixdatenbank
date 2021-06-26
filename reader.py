@@ -243,7 +243,7 @@ class db_connector:
                     (country,))
         return pd.DataFrame(cur.fetchall(), columns=self.SHOW_COLUMNS)
 
-# Wie viele Filme sind aus Land X?
+# 5. Wie viele Filme gibt es pro Land?
     def get_shows_per_country(self):
         cur = self.con.cursor()
         cur.execute("""
@@ -411,20 +411,32 @@ class db_connector:
                     (cast,))
         return pd.DataFrame(cur.fetchall(), columns=("country",))
 
-# Welche Schauspieler waren in Land X?
-    def get_cast_by_country(self, country: str):
-        cur = self.con.cursor()
-        cur.execute("""
-                    SELECT DISTINCT [cast].name
-                    FROM [country], [show_country] as scountry,
-                         [cast], [show_cast] as scast
-                    WHERE scountry.show_id = scast.show_id
-                    AND [country].id = scountry.country_id
-                    AND [cast].id = scast.cast_id
-                    AND [country].name = ?
-                    """,
-                    (country,))
-        return pd.DataFrame(cur.fetchall(), columns=("cast",))
+
+# Pie Diagram: Anzahl Serien vs Anzahl Filme
+
+# 2D-Graphen: Die Entwicklung von Filmen/Serien pro Release Jahr
+
+# Mit Slidern die Anzahl (z.B. 10) betrachteter Schauspieler einstellen und dann ein Pie Chart erstellen
+# mit den ersten z.B. 10 Schauspielern, wobei der Schauspieler mit den meisten Filmen den größten Platz einnimmt
+
+# Wie viele Schauspieler gibt es im Durchschnitt in einem Film/Serie?
+
+# Wie lang sind Filme aus Land X im Durchschnitt?
+
+# Wie viele Saisons hat eine Serie im Schnitt?
+# Balkendiagramm: Saisons nebeneinander aufstellen je nach Anzahl der Serie
+# Y-Achse: Anzahl solche Serien
+# X-Achse: Anzahl Saisons dieser Serien
+
+
+# TODO
+# - ,,gesäuberte" CSV exportieren
+# - Dokumentation
+# - 2x Video 
+#
+# Optional:
+# - OOP
+
 
 if __name__ == "__main__":
     con = db_connector()
