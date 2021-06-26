@@ -198,6 +198,55 @@ class db_connector:
                     (director,))
         return pd.DataFrame(cur.fetchall(), columns=self.SHOW_COLUMNS)
 
+    def get_shows_by_cast(self, cast: str):
+        cur = self.con.cursor()
+        cur.execute(f"""
+                    SELECT s.{", s.".join(self.SHOW_COLUMNS)}
+                    FROM [shows] as s, [cast] as c, [show_cast] as sc
+                    WHERE s.show_id = sc.show_id
+                    AND c.id = sc.cast_id
+                    AND c.name = ?
+                    """,
+                    (cast,))
+        return pd.DataFrame(cur.fetchall(), columns=self.SHOW_COLUMNS)
+
+    def get_shows_by_listing(self, listing: str):
+        cur = self.con.cursor()
+        cur.execute(f"""
+                    SELECT s.{", s.".join(self.SHOW_COLUMNS)}
+                    FROM [shows] as s, [listing] as l, [show_listing] as sl
+                    WHERE s.show_id = sl.show_id
+                    AND l.id = sl.listing_id
+                    AND l.name = ?
+                    """,
+                    (listing,))
+        return pd.DataFrame(cur.fetchall(), columns=self.SHOW_COLUMNS)
+
+    def get_shows_by_country(self, country: str):
+        cur = self.con.cursor()
+        cur.execute(f"""
+                    SELECT s.{", s.".join(self.SHOW_COLUMNS)}
+                    FROM [shows] as s, [country] as c, [show_country] as sc
+                    WHERE s.show_id = sc.show_id
+                    AND c.id = sc.country_id
+                    AND c.name = ?
+                    """,
+                    (country,))
+        return pd.DataFrame(cur.fetchall(), columns=self.SHOW_COLUMNS)
+
+    def get_shows_per_country(self):
+        cur = self.con.cursor()
+        cur.execute("""
+                    SELECT c.name, COUNT(c.name)
+                    FROM [country] as c, [show_country] as sc
+                    WHERE c.id = sc.country_id
+                    GROUP BY c.name
+                    """)
+        return pd.DataFrame(cur.fetchall(), columns=["country", "count"])
+
+    def get_countries_by_show(self, show: str):
+        pass
+
     def get_directors_by_show(self, show: str):
         cur = self.con.cursor()
         cur.execute("""
@@ -210,22 +259,7 @@ class db_connector:
                     (show,))
         return pd.DataFrame(cur.fetchall(), columns=("director",))
 
-    def get_shows_by_cast(self, cast: str):
-        pass
-
     def get_cast_by_show(self, show: str):
-        pass
-
-    def get_shows_by_country(self, country: str):
-        pass
-
-    def get_countries_by_show(self, show: str):
-        pass
-
-    def get_shows_per_country(self):
-        pass
-
-    def get_shows_by_listing(self, listing: str):
         pass
 
     def get_listings_by_show(self, show: str):
@@ -247,5 +281,5 @@ if __name__ == "__main__":
     con = db_connector()
     # con.reset_database()
     # con.import_file("netflix_titles.csv")
-    data = con.get_shows_by_director("George Ford")
+    data = con.get_shows_per_country()
     con.con.close()
