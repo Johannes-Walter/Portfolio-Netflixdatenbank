@@ -37,6 +37,7 @@ class db_connector:
                         VALUES (?, ?)""",
                         (row["show_id"], director))
 
+            
 
         self.con.commit()
         return
@@ -112,6 +113,55 @@ class db_connector:
 
         self.con.commit()
 
+    def get_shows_by_director(self, director: str):
+        cur = self.con.cursor()
+        cur.execute("SELECT ")
+        pass
+
+    def get_directors_by_show(self, show: str):
+        pass
+
+    def get_all_directors(self):
+        pass
+
+    def get_all_shows(self):
+        pass
+
+    def get_all_cast(self):
+        pass
+
+    def get_all_listings(self):
+        pass
+
+    def get_shows_by_cast(self, cast: str):
+        pass
+
+    def get_cast_by_show(self, show: str):
+        pass
+
+    def get_shows_by_country(self, country: str):
+        pass
+
+    def get_countries_by_show(self, show: str):
+        pass
+
+    def get_shows_by_listing(self, listing: str):
+        pass
+
+    def get_listings_by_show(self, show: str):
+        pass
+
+    def get_listings_by_director(self, director: str):
+        pass
+
+    def get_listings_by_cast(self, cast: str):
+        pass
+
+    def get_cast_by_director(self, director: str):
+        pass
+
+    def get_directors_by_cast(self, director: str):
+        pass
 
 if __name__ == "__main__":
     con = db_connector("database")
