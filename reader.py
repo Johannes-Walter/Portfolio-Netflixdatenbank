@@ -400,24 +400,35 @@ class db_connector:
     def get_country_by_cast(self, cast: str):
         cur = self.con.cursor()
         cur.execute("""
-                    SELECT DISTINCT c.name
-                    FROM [country] as c, [show_country] as sc,
-                         [cast] as cast, [show_cast] as scast
-                    WHERE sc.show_id = scast.cast_id
-                    AND c.id = sc.country_id
-                    AND cast.id = scast.cast_id
-                    AND cast.name = ?
+                    SELECT DISTINCT country.name
+                    FROM [country], [show_country] as scountry,
+                         [cast], [show_cast] as scast
+                    WHERE scountry.show_id = scast.show_id
+                    AND country.id = scountry.country_id
+                    AND [cast].id = scast.cast_id
+                    AND [cast].name = ?
                     """,
                     (cast,))
         return pd.DataFrame(cur.fetchall(), columns=("country",))
 
 # Welche Schauspieler waren in Land X?
     def get_cast_by_country(self, country: str):
-        pass
+        cur = self.con.cursor()
+        cur.execute("""
+                    SELECT DISTINCT [cast].name
+                    FROM [country], [show_country] as scountry,
+                         [cast], [show_cast] as scast
+                    WHERE scountry.show_id = scast.show_id
+                    AND [country].id = scountry.country_id
+                    AND [cast].id = scast.cast_id
+                    AND [country].name = ?
+                    """,
+                    (country,))
+        return pd.DataFrame(cur.fetchall(), columns=("cast",))
 
 if __name__ == "__main__":
     con = db_connector()
     # con.reset_database()
     # con.import_file("netflix_titles.csv")
-    data = con.get_country_by_cast("Samuel West")
+    data = con.get_cast_by_country("Germany")
     con.con.close()
