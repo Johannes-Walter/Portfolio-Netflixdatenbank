@@ -359,7 +359,6 @@ class db_connector:
                             columns=("type", "release_year", "count"))
 
     def get_full_table(self):
-        # TODO: Fertig machen
         cur = self.con.cursor()
         cur.execute("""
                     SELECT s.show_id, s.type, s.title, group_concat(DISTINCT director.name) AS director, group_concat(DISTINCT casts.name) AS cast,
@@ -382,6 +381,16 @@ class db_connector:
                                      "director", "cast", "country", "date_added",
                                      "release_year", "rating", "duration",
                                      "listed_in", "description"))
+    
+    def get_types_per_cast(self):
+        cur = self.con.cursor()
+        cur.execute("""
+                    SELECT [cast], type, count(type) count
+                    FROM show_per_cast
+                    GROUP BY [cast], type
+                    """)
+        return pd.DataFrame(cur.fetchall(),
+                            columns=("cast", "type", "count"))
 
 
 # Pie Diagram: Anzahl Serien vs Anzahl Filme
@@ -417,7 +426,7 @@ if __name__ == "__main__":
     #con.reset_database()
     #con.import_file("netflix_titles.csv")
     #con.export_csv()
-    test = con.get_directors_by_cast("Aggy K. Adams")
+    test = con.get_types_per_cast()
     #test = con._db_connector__get_all("show_per_country")
     #test.columns = con.SHOW_COLUMNS + ["country"]
     #test = test[test["title"]=="Houston, We Have a Problem!"]
