@@ -385,11 +385,15 @@ class db_connector:
     def get_types_per_cast(self):
         cur = self.con.cursor()
         cur.execute("""
-                    SELECT [cast], type, count(type) count
-                    FROM show_per_cast
-                    GROUP BY [cast], type
-                    ORDER BY count(type) DESC
-                    """)
+                SELECT [cast], type, count([cast]) AS count
+                FROM show_per_cast
+                GROUP BY [cast], type
+                UNION ALL
+                SELECT [cast], "total", count([cast])
+                FROM show_per_cast
+                GROUP BY [cast]
+                ORDER BY count([cast]) DESC
+                """)
         return pd.DataFrame(cur.fetchall(),
                             columns=("cast", "type", "count"))
 
