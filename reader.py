@@ -165,7 +165,7 @@ class db_connector:
         cur.execute(f"""
             SELECT *
             FROM [{table}_per_{filter_table}]
-            WHERE {filter_table} = ?
+            WHERE [{filter_table}]=?
             """,
             (filter_item,))
         return pd.DataFrame(cur.fetchall())
