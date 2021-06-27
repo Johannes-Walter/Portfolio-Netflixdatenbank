@@ -9,8 +9,9 @@ st.set_page_config(layout="wide") # Wide-Mode
 
 # Here are some settings you have to set:
 # Root-Directory of this file (reqired because of streamlit-weirdness)
+base_directory = "C:\\PortfolioNetflixdatenbank\\"
 #base_directory = "E:\\Programmieren\\Python\\Studieren\\Portfolio-Netflixdatenbank\\"
-base_directory = "D:\\Programme\\Microsoft Visual Studio Code\\Projects\\Python\\- DHBW\\Semester 2 - Portfolio\\Portfolio-Netflixdatenbank\\"
+#base_directory = "D:\\Programme\\Microsoft Visual Studio Code\\Projects\\Python\\- DHBW\\Semester 2 - Portfolio\\Portfolio-Netflixdatenbank\\"
 
 con = reader.db_connector()
 
