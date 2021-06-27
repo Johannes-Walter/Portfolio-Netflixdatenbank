@@ -24,7 +24,6 @@ def showmap():
         max_zoom="10")
 
     choice = ["count"]
-    st.text(base_directory + 'custom_geo.json')
     # choice_selected = st.selectbox("Select choice", choice)
     # add chloropleth layer
     folium.Choropleth(
