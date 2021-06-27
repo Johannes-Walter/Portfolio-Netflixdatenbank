@@ -76,7 +76,8 @@ class db_connector:
     def reset_database(self):
         cur = self.con.cursor()
         cur.execute("DROP TABLE IF EXISTS [shows]")
-        cur.execute("""CREATE TABLE [shows] (
+        cur.execute("""
+            CREATE TABLE [shows] (
             show_id STRING PRIMARY KEY,
             type STRING,
             title STRING,
@@ -86,67 +87,38 @@ class db_connector:
             duration STRING,
             description STRING)""")
 
-        cur.execute("DROP TABLE IF EXISTS [director]")
-        cur.execute("""CREATE TABLE [director] (
-            id INTEGER PRIMARY KEY,
-            name STRING UNIQUE
-            )""")
+        for table in ("country", "cast", "director", "listing"):
+            cur.execute(f"DROP TABLE IF EXISTS [{table}]")
+            cur.execute(f"""
+                CREATE TABLE [{table}](
+                    id INTEGER PRIMARY KEY,
+                    name STRING UNIQUE
+                )""")
 
-        cur.execute("DROP TABLE IF EXISTS [show_director]")
-        cur.execute("""CREATE TABLE [show_director] (
-            id INTEGER PRIMARY KEY,
-            show_id STRING NOT NULL,
-            director_id STRING NOT NULL,
-            FOREIGN KEY (show_id) REFERENCES show (show_id),
-            FOREIGN KEY (director_id) REFERENCES director (id)
-            )""")
+            cur.execute(f"DROP TABLE IF EXISTS [show_{table}]")
+            cur.execute(f"""
+                CREATE TABLE [show_{table}] (
+                    id INTEGER PRIMARY KEY,
+                    show_id STRING NOT NULL,
+                    {table}_id STRING NOT NULL,
+                    FOREIGN KEY (show_id) REFERENCES [show] (show_id),
+                    FOREIGN KEY ({table}_id) REFERENCES [{table}] (id)
+                )""")
 
-        cur.execute("DROP TABLE IF EXISTS [cast]")
-        cur.execute("""CREATE TABLE [cast] (
-            id INTEGER PRIMARY KEY,
-            name STRING UNIQUE
-            )""")
-
-        cur.execute("DROP TABLE IF EXISTS [show_cast]")
-        cur.execute("""CREATE TABLE [show_cast] (
-            id INTEGER PRIMARY KEY,
-            show_id STRING NOT NULL,
-            cast_id STRING NOT NULL,
-            FOREIGN KEY (show_id) REFERENCES [show] (show_id),
-            FOREIGN KEY (cast_id) REFERENCES [cast] (id)
-            )""")
-
-        cur.execute("DROP TABLE IF EXISTS [country]")
-        cur.execute("""CREATE TABLE [country](
-            id INTEGER PRIMARY KEY,
-            name STRING UNIQUE
-            )""")
-
-        cur.execute("DROP TABLE IF EXISTS [show_country]")
-        cur.execute("""CREATE TABLE [show_country] (
-            id INTEGER PRIMARY KEY,
-            show_id STRING NOT NULL,
-            country_id STRING NOT NULL,
-            FOREIGN KEY (show_id) REFERENCES [show] (show_id),
-            FOREIGN KEY (country_id) REFERENCES [country] (id)
-            )""")
-
-        cur.execute("DROP TABLE IF EXISTS [listing]")
-        cur.execute("""CREATE TABLE [listing](
-            id INTEGER PRIMARY KEY,
-            name STRING UNIQUE
-            )""")
-
-        cur.execute("DROP TABLE IF EXISTS [show_listing]")
-        cur.execute("""CREATE TABLE [show_listing] (
-            id INTEGER PRIMARY KEY,
-            show_id STRING NOT NULL,
-            listing_id STRING NOT NULL,
-            FOREIGN KEY (show_id) REFERENCES [show] (show_id),
-            FOREIGN KEY (listing_id) REFERENCES [listing] (id)
-            )""")
+            cur.execute(f"DROP VIEW IF EXISTS [{table}_per_show]")
+            cur.execute(f"""
+                CREATE VIEW {table}_per_show AS
+                    SELECT show_id, group_concat({table[0]}.name, ", ") as name 
+                    FROM {table} AS {table[0]}, show_{table} AS s{table[0]}
+                    WHERE {table[0]}.id = s{table[0]}.{table}_id
+                    GROUP BY s{table[0]}.show_id;
+                """)
 
         self.con.commit()
+
+    def export_csv(self, filename: str = "export.csv"):
+        data = self.get_full_table()
+        data.to_csv(filename)
 
 # Welche Schauspieler gibt es bei Netflix-Filmen?
     def get_all_cast(self):
@@ -411,6 +383,24 @@ class db_connector:
                     (cast,))
         return pd.DataFrame(cur.fetchall(), columns=("country",))
 
+    def get_full_table(self):
+        # TODO: Fertig machen
+        cur = self.con.cursor()
+        cur.execute("""
+                    SELECT s.show_id, s.type, s.title, dps.name, [castps].name, cps.name, s.date_added, s.release_year, s.rating, s.duration, lps.name, s.description
+                    FROM [shows] as s,
+                        [cast_per_show] as castps,
+                        [country_per_show] as cps,
+                        [director_per_show] as dps,
+                        [listing_per_show] as lps
+                    WHERE s.show_id = castps.show_id
+                    AND s.show_id = cps.show_id
+                    AND s.show_id = dps.show_id
+                    AND s.show_id = lps.show_id
+                    GROUP BY s.show_id, s.type, s.title, s.date_added, s.release_year, s.rating, s.duration, s.description
+                    """)
+        return pd.DataFrame(cur.fetchall(), columns=("show_id", "type", "title", "director", "cast", "country", "date_added", "release_year", "rating", "duration", "listed_in", "description"))
+
 
 # Pie Diagram: Anzahl Serien vs Anzahl Filme
 
@@ -444,5 +434,5 @@ if __name__ == "__main__":
     con = db_connector()
     # con.reset_database()
     # con.import_file("netflix_titles.csv")
-    data = con.get_cast_by_country("Germany")
+    con.export_csv()
     con.con.close()
