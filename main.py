@@ -5,7 +5,8 @@ import folium
 import reader
 import plotly.express as px
 
-base_directory = "E:\\Programmieren\\Python\\Studieren\\Portfolio-Netflixdatenbank\\"
+base_directory_johannes = "E:\\Programmieren\\Python\\Studieren\\Portfolio-Netflixdatenbank\\"
+base_directory = "D:\\Programme\\Microsoft Visual Studio Code\\Projects\\Python\\- DHBW\\Semester 2 - Portfolio\\Portfolio-Netflixdatenbank\\"
 
 def showmap():
     # geodata-source: https://geojson-maps.ash.ms/
@@ -78,7 +79,7 @@ fragen = ["1. In welchen Filmen hat Schauspieler X gespielt?",
           "5. Wie viele Filme gibt es pro Land?",
           "6. Weitere Visualisierungen"]
 
-y = st.selectbox("Wähle aus", fragen)
+y = st.selectbox("Datenauswahl", fragen)
 
 if y == fragen[0]:
 
