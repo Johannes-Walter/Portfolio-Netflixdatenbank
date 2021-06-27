@@ -1,3 +1,5 @@
+Matrikelnummern der Gruppe: 4869673, 5058121, 2177693
+
 # Portfolio-Netflixdatenbank
 
 ## Betriebsanleitung
