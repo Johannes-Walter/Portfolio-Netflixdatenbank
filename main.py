@@ -95,7 +95,7 @@ if y == fragen[0]:
 
 elif y == fragen[1]:
 
-    z = st.text_input("Name des Regisseurs eingeben")
+    z = st.selectbox("Name des Regisseurs eingeben", con.get_all_directors()["director"])
     if z:
         st.subheader(f"{z} hat bei folgenden Filmen Regie geführt:")
         directors = con.get_shows_by_director(z)["title"]
@@ -104,11 +104,11 @@ elif y == fragen[1]:
 
 elif y == fragen[2]:
 
-    z = st.text_input(
-        "Bitte wählen Sie ein Genre aus (z.B. Action, Drama, etc...)")
+    z = st.selectbox(
+        "Bitte wählen Sie ein Genre aus (z.B. Action, Drama, etc...)", con.get_all_listed_in()["listed_in"])
     if z:
         st.subheader(f"Folgende Filme gehören zu dem Genre {z}:")
-        genre = con.get_shows_by_listing(z)["title"]
+        genre = con.get_shows_by_listed_in(z)["title"]
         st.write(genre)
 
 elif y == fragen[3]:
@@ -149,20 +149,18 @@ elif y == fragen[5]:
     elif selection == selections[1]:
 
         st.sidebar.header("Filteroptionen")
-        bar_col, x = st.beta_columns(2)
+        bar_col, o = st.beta_columns(2)
 
         x = ["Zeige nur Filme", "Zeige nur Serien", "Zeige Filme und Serien"]
 
         select = st.sidebar.selectbox("Wählen Sie:", [i for i in x])
         if select == x[0]:
 
-            years = con.get_type_count_per_year()[
-                con.get_type_count_per_year()["type"] == "Movie"]
+            years = con.get_type_count_per_year()[con.get_type_count_per_year()["type"] == "Movie"]
 
         elif select == x[1]:
 
-            years = con.get_type_count_per_year()[
-                con.get_type_count_per_year()["type"] == "TV Show"]
+            years = con.get_type_count_per_year()[con.get_type_count_per_year()["type"] == "TV Show"]
 
         elif select == x[2]:
 
@@ -173,7 +171,9 @@ elif y == fragen[5]:
                                    int(max(con.get_all_shows()["release_year"].values)), (1970, 1980))
 
         if slider:
+
             years = years[years['release_year'].between(slider[0], slider[1])]
+
             fig = px.bar(
                 years,
                 x='release_year',
@@ -184,6 +184,7 @@ elif y == fragen[5]:
             bar_col.write(fig)
 
     elif selection == selections[2]:
+
         st.sidebar.header("Filteroptionen")
 
         x = ["Zeige nur Filme", "Zeige nur Serien", "Zeige Filme und Serien"]
