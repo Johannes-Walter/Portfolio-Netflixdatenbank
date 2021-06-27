@@ -394,28 +394,10 @@ class db_connector:
                             columns=("cast", "type", "count"))
 
 
-# Pie Diagram: Anzahl Serien vs Anzahl Filme
-
-# 2D-Graphen: Die Entwicklung von Filmen/Serien pro Release Jahr
-
-# Mit Slidern die Anzahl (z.B. 10) betrachteter Schauspieler einstellen und dann ein Pie Chart erstellen
-# mit den ersten z.B. 10 Schauspielern, wobei der Schauspieler mit den meisten Filmen den größten Platz einnimmt
-
-# Wie viele Schauspieler gibt es im Durchschnitt in einem Film/Serie?
-
-# Wie lang sind Filme aus Land X im Durchschnitt?
-
-# Wie viele Saisons hat eine Serie im Schnitt?
-# Balkendiagramm: Saisons nebeneinander aufstellen je nach Anzahl der Serie
-# Y-Achse: Anzahl solche Serien
-# X-Achse: Anzahl Saisons dieser Serien
-
-
 # TODO
-# - ,,gesäuberte" CSV exportieren
-# - Dokumentation
+# Johannes: 1. Query fixen get_all_cast oder get_shows_by_cast (Z.78-94 in Leons Code)
 # - 2x Video + Upload
-# - README fertigstellen
+# - README erstellen (ganze Doku rein)
 # - Streamlit-Application deployen
 #
 # Optional:
