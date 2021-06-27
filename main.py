@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+# Matrikelnummern der Gruppe: 4869673, 5058121, 2177693
+
 import streamlit as st
 from streamlit_folium import folium_static
 import folium
@@ -9,7 +10,7 @@ st.set_page_config(layout="wide") # Wide-Mode
 
 # Here are some settings you have to set:
 # Root-Directory of this file (reqired because of streamlit-weirdness)
-base_directory = "C:\\PortfolioNetflixdatenbank\\"
+base_directory = "C:\\Portfolio-Netflixdatenbank\\"
 
 con = reader.db_connector()
 

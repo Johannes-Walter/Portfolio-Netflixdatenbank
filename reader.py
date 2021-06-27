@@ -395,11 +395,3 @@ class db_connector:
                 """)
         return pd.DataFrame(cur.fetchall(),
                             columns=("cast", "type", "count"))
-
-
-# TODO
-# - 2x Video + Upload
-# - README erstellen (ganze Doku rein)
-#
-# Optional:
-# - OOP
