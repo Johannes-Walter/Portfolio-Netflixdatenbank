@@ -265,13 +265,9 @@ class db_connector:
     def get_listed_ins_by_director(self, director: str):
         cur = self.con.cursor()
         cur.execute("""
-                    SELECT DISTINCT l.name
-                    FROM [listed_in] as l, [show_listed_in] as sl,
-                         [director] as d, [show_director] as sd
-                    WHERE sl.show_id = sd.show_id
-                    AND l.id = sl.listed_in_id
-                    AND d.id = sd.director_id
-                    AND d.name = ?
+                    SELECT DISTINCT listed_in
+                    FROM listed_in_per_director
+                    WHERE director = ?
                     """,
                     (director,))
         return pd.DataFrame(cur.fetchall(), columns=("listed_in",))
@@ -280,13 +276,9 @@ class db_connector:
     def get_listed_ins_by_cast(self, cast: str):
         cur = self.con.cursor()
         cur.execute("""
-                    SELECT DISTINCT l.name
-                    FROM [listed_in] as l, [show_listed_in] as sl,
-                         [cast] as c, [show_cast] as sc
-                    WHERE sl.show_id = sc.show_id
-                    AND l.id = sl.listed_in_id
-                    AND c.id = sc.cast_id
-                    AND c.name = ?
+                    SELECT DISTINCT listed_in
+                    FROM listed_in_per_cast
+                    WHERE cast = ?
                     """,
                     (cast,))
         return pd.DataFrame(cur.fetchall(), columns=("listed_in",))
@@ -295,13 +287,9 @@ class db_connector:
     def get_cast_by_director(self, director: str):
         cur = self.con.cursor()
         cur.execute("""
-                    SELECT DISTINCT c.name
-                    FROM [cast] as c, [show_cast] as sc,
-                         [director] as d, [show_director] as sd
-                    WHERE sc.show_id = sd.show_id
-                    AND c.id = sc.cast_id
-                    AND d.id = sd.director_id
-                    AND d.name = ?
+                    SELECT DISTINCT [cast]
+                    FROM cast_per_director
+                    WHERE director = ?
                     """,
                     (director,))
         return pd.DataFrame(cur.fetchall(), columns=("cast",))
@@ -310,13 +298,9 @@ class db_connector:
     def get_directors_by_cast(self, cast: str):
         cur = self.con.cursor()
         cur.execute("""
-                    SELECT DISTINCT d.name
-                    FROM [cast] as c, [show_cast] as sc,
-                         [director] as d, [show_director] as sd
-                    WHERE sc.show_id = sd.show_id
-                    AND c.id = sc.cast_id
-                    AND d.id = sd.director_id
-                    AND c.name = ?
+                    SELECT DISTINCT director
+                    FROM director_per_cast
+                    WHERE [cast] = ?
                     """,
                     (cast,))
         return pd.DataFrame(cur.fetchall(), columns=("director",))
@@ -325,13 +309,9 @@ class db_connector:
     def get_country_by_director(self, director: str):
         cur = self.con.cursor()
         cur.execute("""
-                    SELECT DISTINCT c.name
-                    FROM [country] as c, [show_country] as sc,
-                         [director] as d, [show_director] as sd
-                    WHERE sc.show_id = sd.show_id
-                    AND c.id = sc.country_id
-                    AND d.id = sd.director_id
-                    AND d.name = ?
+                    SELECT DISTINCT country
+                    FROM country_per_director
+                    WHERE director = ?
                     """,
                     (director,))
         return pd.DataFrame(cur.fetchall(), columns=("country",))
@@ -340,28 +320,20 @@ class db_connector:
     def get_director_by_country(self, country: str):
         cur = self.con.cursor()
         cur.execute("""
-                    SELECT DISTINCT d.name
-                    FROM [country] as c, [show_country] as sc,
-                         [director] as d, [show_director] as sd
-                    WHERE sc.show_id = sd.show_id
-                    AND c.id = sc.country_id
-                    AND d.id = sd.director_id
-                    AND c.name = ?
+                    SELECT DISTINCT director
+                    FROM director_per_country
+                    WHERE country = ?
                     """,
                     (country,))
-        return pd.DataFrame(cur.fetchall(), columns=("country",))
+        return pd.DataFrame(cur.fetchall(), columns=("director",))
 
 # In welchen Ländern war X Schauspieler?
     def get_country_by_cast(self, cast: str):
         cur = self.con.cursor()
         cur.execute("""
-                    SELECT DISTINCT country.name
-                    FROM [country], [show_country] as scountry,
-                         [cast], [show_cast] as scast
-                    WHERE scountry.show_id = scast.show_id
-                    AND country.id = scountry.country_id
-                    AND [cast].id = scast.cast_id
-                    AND [cast].name = ?
+                    SELECT DISTINCT country
+                    FROM country_per_cast
+                    WHERE country = ?
                     """,
                     (cast,))
         return pd.DataFrame(cur.fetchall(), columns=("country",))
@@ -445,7 +417,7 @@ if __name__ == "__main__":
     #con.reset_database()
     #con.import_file("netflix_titles.csv")
     #con.export_csv()
-    test = con.get_type_count_per_year()
+    test = con.get_directors_by_cast("Aggy K. Adams")
     #test = con._db_connector__get_all("show_per_country")
     #test.columns = con.SHOW_COLUMNS + ["country"]
     #test = test[test["title"]=="Houston, We Have a Problem!"]
