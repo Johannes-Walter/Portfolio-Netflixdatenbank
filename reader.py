@@ -376,6 +376,16 @@ class db_connector:
         return pd.DataFrame(cur.fetchall(),
                             columns=("type", "count"))
 
+    def get_type_count_per_year(self):
+        cur = self.con.cursor()
+        cur.execute("""
+                SELECT type, release_year, count(type)
+                FROM show
+                GROUP BY type, release_year
+                """)
+        return pd.DataFrame(cur.fetchall(),
+                            columns=("type", "release_year", "count"))
+
     def get_full_table(self):
         # TODO: Fertig machen
         cur = self.con.cursor()
@@ -435,7 +445,7 @@ if __name__ == "__main__":
     #con.reset_database()
     #con.import_file("netflix_titles.csv")
     #con.export_csv()
-    test = con.get_type_count()
+    test = con.get_type_count_per_year()
     #test = con._db_connector__get_all("show_per_country")
     #test.columns = con.SHOW_COLUMNS + ["country"]
     #test = test[test["title"]=="Houston, We Have a Problem!"]
