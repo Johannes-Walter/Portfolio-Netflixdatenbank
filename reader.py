@@ -11,7 +11,9 @@ import itertools
 
 
 class db_connector:
-    SHOW_COLUMNS = ["show_id", "type", "title", "date_added", "release_year", "rating", "duration", "description"]
+    SHOW_COLUMNS = ["show_id", "type", "title",
+                    "date_added", "release_year", 
+                    "rating", "duration", "description"]
     DIRECTOR_COLUMNS = ["id", "name"]
     COUNTRY_COLUMNS = ["id", "name"]
     listed_in_COLUMNS = ["id", "name"]
@@ -360,9 +362,13 @@ class db_connector:
     def get_full_table(self):
         cur = self.con.cursor()
         cur.execute("""
-                    SELECT s.show_id, s.type, s.title, group_concat(DISTINCT director.name) AS director, group_concat(DISTINCT casts.name) AS cast,
-                        group_concat(DISTINCT country.name) AS country, s.date_added, s.release_year, s.rating,
-                        s.duration, group_concat(DISTINCT listed_in.name) AS "listed in", s.description
+                    SELECT s.show_id, s.type, s.title,
+                        group_concat(DISTINCT director.name) AS director,
+                        group_concat(DISTINCT casts.name) AS cast,
+                        group_concat(DISTINCT country.name) AS country,
+                        s.date_added, s.release_year, s.rating, s.duration,
+                        group_concat(DISTINCT listed_in.name) AS "listed in",
+                        s.description
                     FROM [show] as s
                     LEFT JOIN [cast_per_show] as casts
                         ON s.show_id = casts.show_id
@@ -395,11 +401,3 @@ class db_connector:
                 """)
         return pd.DataFrame(cur.fetchall(),
                             columns=("cast", "type", "count"))
-
-
-# TODO
-# - 2x Video + Upload
-# - README erstellen (ganze Doku rein)
-#
-# Optional:
-# - OOP
