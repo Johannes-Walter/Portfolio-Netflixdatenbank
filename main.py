@@ -82,7 +82,7 @@ fragen = ["1. In welchen Filmen hat Schauspieler X gespielt?",
           "5. Wie viele Filme gibt es pro Land?",
           "6. Weitere Visualisierungen"]
 
-y = st.selectbox("Wähle aus", [i for i in fragen])
+y = st.selectbox("Wähle aus", fragen)
 
 if y == fragen[0]:
 
