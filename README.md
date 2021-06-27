@@ -1,39 +1,19 @@
 # Portfolio-Netflixdatenbank
- 
-"""
-#TODO
 
+## Betriebsanleitung
 
-- Datenbank
-    - filtern
-    - speichern
-    - Suchmaske
-    - Rückgabetyp (Pandas?)
+- Base Directory:
+  1. Im Verzeichnis "C:/" soll ein Ordner ,,Portfolio-Netflixdatenbank" erstellt werden.
+  2. Der Ordner-Pfad soll nun so aussehen: ,,C:/Portfolio-Netflixdatenbank/".
+  3. Die Zip-Datei der Portfolio-Arbeit soll heruntergeladen und entpackt werden.
+  4. Der Inhalt soll in den Ordner ,,Portfolio-Netflixdatenbank" verschoben werden.
 
-- Kartendarstellung (Streamlit/eher Excel?)
+- Module/Libraries:
+  - In der Datei ,,requirements.txt" sind die benötigten Module aufgelistet.
+  - Die hier genannten Module sollen durch ,,pip install modulname" mithilfe der Kommandozeile installiert werden.
 
-- UI mit Streamlit/Flask
-
-- Graphen (Interaktion mit UI)
-
-- Objektorientierung prüfen
-
-- Video aufnehmen/schneiden
-    - 4MAT
-
-
-WAS SOLL MAN DARSTELLEN KÖNNEN?
-WAS DAVON BRINGT ETWAS?
-- In wie vielen Filmen hat der Schauspieler mitgemacht?
-- Wie viele Filme pro Land gibt es? (Heatmap)
-- Wie viele Filme pro Einwohner?
-- Wie viele Saisons hat eine Serie im Schnitt?
-- Wie lang sind Filme aus USA im Schnitt im Gegensatz zu Indien? (Boxplot mit min,avg,max)
-- Wie viel Schauspieler gibt es im Durchschnitt in einer Serie?
-
-
-DV:
-- Dashboard mit matplotlib/streamlit/excel
-
-
-"""
+- Streamlit:
+  - Sobald das ,,streamlit"-Modul installiert ist, kann nun Streamlit gestartet werden
+  - Dazu soll in die Kommandozeile erst ,,C:\Portfolio-Netflixdatenbank" eingegeben werden.
+  - Anschließend soll ,,streamlit run main.py" in die Kommandozeile eingegeben werden.
+  - Es öffnet sich ein Browserfenster. Dieses Fenster ist das fertige Dashboard und kann nun benutzt werden.
