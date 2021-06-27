@@ -4,8 +4,19 @@ from streamlit_folium import folium_static
 import folium
 import reader
 import plotly.express as px
-
+# Here are some settings you have to set:
+# Root-Directory of this file (reqired because of streamlit-weirdness)
 base_directory = "E:\\Programmieren\\Python\\Studieren\\Portfolio-Netflixdatenbank\\"
+
+# Set this Setting on "True" if you want to reload the Database - Warning, this will slow the programm significantly!
+reset_database = False
+
+con = reader.db_connector()
+
+if reset_database:
+    con.reset_database()
+    con.import_file(base_directory + "netflix_titles.csv")
+
 
 def showmap():
     # geodata-source: https://geojson-maps.ash.ms/
@@ -45,11 +56,6 @@ def showmap():
         popup=folium.features.GeoJsonPopup(
             fields=["name"])).add_to(m)
     folium_static(m, width=1755, height=950 * 0.75)
-
-
-con = reader.db_connector()
-con.reset_database()
-con.import_file(base_directory + "netflix_titles.csv")
 
 st.set_page_config(layout="wide")
 
