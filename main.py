@@ -11,11 +11,17 @@ base_directory = "E:\\Programmieren\\Python\\Studieren\\Portfolio-Netflixdatenba
 # Set this Setting on "True" if you want to reload the Database - Warning, this will slow the programm significantly!
 reset_database = False
 
+# Set this boolean "True" if the Data should be exported.
+export_database = False
+
 con = reader.db_connector()
 
 if reset_database:
     con.reset_database()
     con.import_file(base_directory + "netflix_titles.csv")
+
+if export_database:
+    con.export_csv()
 
 
 def showmap():
