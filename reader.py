@@ -399,7 +399,6 @@ class db_connector:
 
 
 # TODO
-# Johannes: 1. Query fixen get_all_cast oder get_shows_by_cast (Z.78-94 in Leons Code)
 # - 2x Video + Upload
 # - README erstellen (ganze Doku rein)
 # - Streamlit-Application deployen
