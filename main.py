@@ -4,6 +4,7 @@ from streamlit_folium import folium_static
 import folium
 import reader
 import plotly.express as px
+
 # Here are some settings you have to set:
 # Root-Directory of this file (reqired because of streamlit-weirdness)
 base_directory = "E:\\Programmieren\\Python\\Studieren\\Portfolio-Netflixdatenbank\\"
@@ -22,6 +23,10 @@ if reset_database:
 
 if export_database:
     con.export_csv()
+
+
+base_directory = "E:\\Programmieren\\Python\\Studieren\\Portfolio-Netflixdatenbank\\"
+base_directory_alex = "D:\\Programme\\Microsoft Visual Studio Code\\Projects\\Python\\- DHBW\\Semester 2 - Portfolio\\Portfolio-Netflixdatenbank\\"
 
 
 def showmap():
@@ -63,6 +68,11 @@ def showmap():
             fields=["name"])).add_to(m)
     folium_static(m, width=1755, height=950 * 0.75)
 
+
+con = reader.db_connector()
+con.reset_database()
+con.import_file(base_directory + "netflix_titles.csv")
+
 st.set_page_config(layout="wide")
 
 hide_streamlit_style = """
@@ -90,7 +100,7 @@ fragen = ["1. In welchen Filmen hat Schauspieler X gespielt?",
           "5. Wie viele Filme gibt es pro Land?",
           "6. Weitere Visualisierungen"]
 
-y = st.selectbox("Wähle aus", fragen)
+y = st.selectbox("Datenauswahl", fragen)
 
 if y == fragen[0]:
 
