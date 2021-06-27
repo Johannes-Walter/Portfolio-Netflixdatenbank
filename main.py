@@ -7,8 +7,8 @@ import plotly.express as px
 
 # Here are some settings you have to set:
 # Root-Directory of this file (reqired because of streamlit-weirdness)
-#base_directory = "E:\\Programmieren\\Python\\Studieren\\Portfolio-Netflixdatenbank\\"
-base_directory = "D:\\Programme\\Microsoft Visual Studio Code\\Projects\\Python\\- DHBW\\Semester 2 - Portfolio\\Portfolio-Netflixdatenbank\\"
+base_directory = "E:\\Programmieren\\Python\\Studieren\\Portfolio-Netflixdatenbank\\"
+#base_directory = "D:\\Programme\\Microsoft Visual Studio Code\\Projects\\Python\\- DHBW\\Semester 2 - Portfolio\\Portfolio-Netflixdatenbank\\"
 
 # Set this Setting on "True" if you want to reload the Database - Warning, this will slow the programm significantly!
 reset_database = False
@@ -28,9 +28,6 @@ if st.button("Exportiere die Datenbank"):
 if export_database:
     con.export_csv(base_directory + "export.csv")
 
-
-base_directory_johannes = "E:\\Programmieren\\Python\\Studieren\\Portfolio-Netflixdatenbank\\"
-base_directory = "D:\\Programme\\Microsoft Visual Studio Code\\Projects\\Python\\- DHBW\\Semester 2 - Portfolio\\Portfolio-Netflixdatenbank\\"
 
 def showmap():
     # geodata-source: https://geojson-maps.ash.ms/
