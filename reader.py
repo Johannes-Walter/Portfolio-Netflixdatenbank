@@ -145,9 +145,8 @@ class db_connector:
 
         self.con.commit()
 
-    def export_csv(self, filename: str = "export.csv"):
+    def export_csv(self, filename: str):
         data = self.get_full_table()
-        print(data["show_id"])
         data["show_id"] = "s" + data["show_id"].astype(str)
         data.set_index("show_id", inplace=True)
         data.to_csv(filename, encoding="UTF-8")
@@ -399,10 +398,8 @@ class db_connector:
 
 
 # TODO
-# Johannes: 1. Query fixen get_all_cast oder get_shows_by_cast (Z.78-94 in Leons Code)
 # - 2x Video + Upload
 # - README erstellen (ganze Doku rein)
-# - Streamlit-Application deployen
 #
 # Optional:
 # - OOP
