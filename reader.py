@@ -152,6 +152,34 @@ class db_connector:
         data["show_id"] = "s" + data["show_id"].astype(str)
         data.set_index("show_id", inplace=True)
         data.to_csv(filename, encoding="UTF-8")
+        
+    def get_full_table(self):
+        cur = self.con.cursor()
+        cur.execute("""
+                    SELECT s.show_id, s.type, s.title,
+                        group_concat(DISTINCT director.name) AS director,
+                        group_concat(DISTINCT casts.name) AS cast,
+                        group_concat(DISTINCT country.name) AS country,
+                        s.date_added, s.release_year, s.rating, s.duration,
+                        group_concat(DISTINCT listed_in.name) AS "listed in",
+                        s.description
+                    FROM [show] as s
+                    LEFT JOIN [cast_per_show] as casts
+                        ON s.show_id = casts.show_id
+                    LEFT JOIN [country_per_show] as country
+                        ON s.show_id = country.show_id
+                    LEFT JOIN [director_per_show] as director
+                        ON s.show_id = director.show_id
+                    LEFT JOIN [listed_in_per_show] as listed_in
+                        ON s.show_id = listed_in.show_id
+                    GROUP BY s.show_id, s.type, s.title, s.date_added,
+                        s.release_year, s.rating, s.duration, s.description
+                    """)
+        return pd.DataFrame(cur.fetchall(),
+                            columns=("show_id", "type", "title",
+                                     "director", "cast", "country", "date_added",
+                                     "release_year", "rating", "duration",
+                                     "listed_in", "description"))
 
     def __get_all(self, table: str):
         cur = self.con.cursor()
@@ -242,14 +270,12 @@ class db_connector:
         data.columns = self.SHOW_COLUMNS + ["country"]
         return data[data["title"]==show]
         
-# TODO: Kommentar sollte anders rum sein
 #1. In welchen Filmen war X ein Regisseur?
     def get_directors_by_show(self, show: str):
         data = self.__get_all("show_per_director")
         data.columns = self.SHOW_COLUMNS + ["director"]
         return data[data["show"]==show]
 
-# TODO: Auch hier sollte es anders rum sein
 # In welchen Filmen war X ein Schauspieler?
     def get_cast_by_show(self, show: str):
         data = self.__get_all("show_per_cast")
@@ -358,34 +384,6 @@ class db_connector:
                 """)
         return pd.DataFrame(cur.fetchall(),
                             columns=("type", "release_year", "count"))
-
-    def get_full_table(self):
-        cur = self.con.cursor()
-        cur.execute("""
-                    SELECT s.show_id, s.type, s.title,
-                        group_concat(DISTINCT director.name) AS director,
-                        group_concat(DISTINCT casts.name) AS cast,
-                        group_concat(DISTINCT country.name) AS country,
-                        s.date_added, s.release_year, s.rating, s.duration,
-                        group_concat(DISTINCT listed_in.name) AS "listed in",
-                        s.description
-                    FROM [show] as s
-                    LEFT JOIN [cast_per_show] as casts
-                        ON s.show_id = casts.show_id
-                    LEFT JOIN [country_per_show] as country
-                        ON s.show_id = country.show_id
-                    LEFT JOIN [director_per_show] as director
-                        ON s.show_id = director.show_id
-                    LEFT JOIN [listed_in_per_show] as listed_in
-                        ON s.show_id = listed_in.show_id
-                    GROUP BY s.show_id, s.type, s.title, s.date_added,
-                        s.release_year, s.rating, s.duration, s.description
-                    """)
-        return pd.DataFrame(cur.fetchall(),
-                            columns=("show_id", "type", "title",
-                                     "director", "cast", "country", "date_added",
-                                     "release_year", "rating", "duration",
-                                     "listed_in", "description"))
     
     def get_types_per_cast(self):
         cur = self.con.cursor()

@@ -1,32 +1,32 @@
-# -*- coding: utf-8 -*-
+# Matrikelnummern der Gruppe: 4869673, 5058121, 2177693
+
 import streamlit as st
 from streamlit_folium import folium_static
 import folium
 import reader
 import plotly.express as px
 
+st.set_page_config(layout="wide") # Wide-Mode
+
 # Here are some settings you have to set:
 # Root-Directory of this file (reqired because of streamlit-weirdness)
-base_directory = "E:\\Programmieren\\Python\\Studieren\\Portfolio-Netflixdatenbank\\"
-#base_directory = "D:\\Programme\\Microsoft Visual Studio Code\\Projects\\Python\\- DHBW\\Semester 2 - Portfolio\\Portfolio-Netflixdatenbank\\"
-
-# Set this Setting on "True" if you want to reload the Database - Warning, this will slow the programm significantly!
-reset_database = False
-
-# Set this boolean "True" if the Data should be exported.
-export_database = False
+base_directory = "C:\\Portfolio-Netflixdatenbank\\"
 
 con = reader.db_connector()
 
-if reset_database:
-    con.reset_database()
-    con.import_file(base_directory + "netflix_titles.csv")
+# 6 columns side by side for buttons, but only the first 2 are used.
+left, right, _, _, _, _,= st.beta_columns(6)
 
-if st.button("Exportiere die Datenbank"):
-    export_database = True
-
-if export_database:
-    con.export_csv(base_directory + "export.csv")
+with left:
+    # Set this Setting on "True" if you want to reload the Database - Warning, this will slow the programm significantly!
+    if st.button("Datenbank zurücksetzen"):
+        con.reset_database()
+        con.import_file(base_directory + "netflix_titles.csv")
+with right:
+    # Data should be exported, if button is clicked
+    if st.button("Exportiere die Datenbank"):
+        con.export_csv(base_directory + "export.csv")
+    
 
 
 def showmap():
@@ -73,7 +73,6 @@ con = reader.db_connector()
 con.reset_database()
 con.import_file(base_directory + "netflix_titles.csv")
 
-st.set_page_config(layout="wide")
 
 hide_streamlit_style = """
             <style>
