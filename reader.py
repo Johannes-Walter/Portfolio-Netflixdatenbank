@@ -7,6 +7,7 @@ Matrikelnummern der Gruppe:
 import pandas as pd
 import numpy as np
 import sqlite3
+import itertools
 
 
 class db_connector:
@@ -31,6 +32,7 @@ class db_connector:
         # Zeilenumbrüche Löschen, um aufzuräumen
         data = data.replace("\\n", " ", regex=True)
         data = data.replace(np.nan, "", regex=True)
+        data["show_id"] = data["show_id"].replace("s", "", regex=True).astype(int)
 
         cur.executemany(f"""
             INSERT INTO [shows] ({", ".join(self.SHOW_COLUMNS)})
@@ -78,7 +80,7 @@ class db_connector:
         cur.execute("DROP TABLE IF EXISTS [shows]")
         cur.execute("""
             CREATE TABLE [shows] (
-            show_id STRING PRIMARY KEY,
+            show_id INTEGER PRIMARY KEY,
             type STRING,
             title STRING,
             date_added STRING,
@@ -104,21 +106,50 @@ class db_connector:
                     FOREIGN KEY (show_id) REFERENCES [show] (show_id),
                     FOREIGN KEY ({table}_id) REFERENCES [{table}] (id)
                 )""")
-
             cur.execute(f"DROP VIEW IF EXISTS [{table}_per_show]")
             cur.execute(f"""
-                CREATE VIEW {table}_per_show AS
-                    SELECT show_id, group_concat({table[0]}.name, ", ") as name 
-                    FROM {table} AS {table[0]}, show_{table} AS s{table[0]}
-                    WHERE {table[0]}.id = s{table[0]}.{table}_id
-                    GROUP BY s{table[0]}.show_id;
+                CREATE VIEW [{table}_per_show] AS
+                    SELECT show_table.show_id, tbl.name
+                    FROM [{table}] AS tbl
+                    LEFT JOIN [show_{table}] AS show_table
+                    ON tbl.id = show_table.{table}_id
+                    WHERE tbl.name != ""
+                    AND tbl.name NOT NULL
+                """)
+            cur.execute(f"DROP VIEW IF EXISTS [show_per_{table}]")
+            cur.execute(f"""
+                CREATE VIEW [show_per_{table}] AS
+                    SELECT s.{", s.".join(self.SHOW_COLUMNS)}, tbl.name AS [{table}]
+                    FROM [shows] AS s
+                    LEFT JOIN [show_{table}] AS show_table
+                        ON s.show_id = show_table.show_id
+                    LEFT JOIN [{table}] as tbl
+                        ON show_table.{table}_id = tbl.id
+                    WHERE tbl.name != ""
+                    AND tbl.name NOT NULL
+                """)
+
+        for table1, table2 in itertools.permutations(("country", "cast", "director", "listing"), 2):
+            print(f"{table1}_per_{table2}")
+            cur.execute(f"DROP VIEW IF EXISTS [{table1}_per_{table2}]")
+            cur.execute(f"""
+                Create View [{table1}_per_{table2}] AS
+                SELECT t1.show_id, t1.name AS {table1}, t2.name AS {table2}
+                FROM [{table1}_per_show] AS t1
+                LEFT JOIN [{table2}_per_show] AS t2
+                ON t1.show_id = t2.show_id
                 """)
 
         self.con.commit()
 
     def export_csv(self, filename: str = "export.csv"):
         data = self.get_full_table()
-        data.to_csv(filename)
+        print(data["show_id"])
+        data["show_id"] = "s" + data["show_id"].astype(str)
+        data.set_index("show_id", inplace=True)
+        data.to_csv(filename, encoding="UTF-8")
+
+    def __get_all(self, str: )
 
 # Welche Schauspieler gibt es bei Netflix-Filmen?
     def get_all_cast(self):
@@ -387,19 +418,26 @@ class db_connector:
         # TODO: Fertig machen
         cur = self.con.cursor()
         cur.execute("""
-                    SELECT s.show_id, s.type, s.title, dps.name, [castps].name, cps.name, s.date_added, s.release_year, s.rating, s.duration, lps.name, s.description
-                    FROM [shows] as s,
-                        [cast_per_show] as castps,
-                        [country_per_show] as cps,
-                        [director_per_show] as dps,
-                        [listing_per_show] as lps
-                    WHERE s.show_id = castps.show_id
-                    AND s.show_id = cps.show_id
-                    AND s.show_id = dps.show_id
-                    AND s.show_id = lps.show_id
-                    GROUP BY s.show_id, s.type, s.title, s.date_added, s.release_year, s.rating, s.duration, s.description
+                    SELECT s.show_id, s.type, s.title, group_concat(DISTINCT director.name) AS director, group_concat(DISTINCT casts.name) AS cast,
+                        group_concat(DISTINCT country.name) AS country, s.date_added, s.release_year, s.rating,
+                        s.duration, group_concat(DISTINCT listing.name) AS "listed in", s.description
+                    FROM [shows] as s
+                    LEFT JOIN [cast_per_show] as casts
+                        ON s.show_id = casts.show_id
+                    LEFT JOIN [country_per_show] as country
+                        ON s.show_id = country.show_id
+                    LEFT JOIN [director_per_show] as director
+                        ON s.show_id = director.show_id
+                    LEFT JOIN [listing_per_show] as listing
+                        ON s.show_id = listing.show_id
+                    GROUP BY s.show_id, s.type, s.title, s.date_added,
+                        s.release_year, s.rating, s.duration, s.description
                     """)
-        return pd.DataFrame(cur.fetchall(), columns=("show_id", "type", "title", "director", "cast", "country", "date_added", "release_year", "rating", "duration", "listed_in", "description"))
+        return pd.DataFrame(cur.fetchall(),
+                            columns=("show_id", "type", "title",
+                                     "director", "cast", "country", "date_added",
+                                     "release_year", "rating", "duration",
+                                     "listed_in", "description"))
 
 
 # Pie Diagram: Anzahl Serien vs Anzahl Filme
@@ -432,7 +470,7 @@ class db_connector:
 
 if __name__ == "__main__":
     con = db_connector()
-    # con.reset_database()
-    # con.import_file("netflix_titles.csv")
+    con.reset_database()
+    con.import_file("netflix_titles.csv")
     con.export_csv()
     con.con.close()
