@@ -130,7 +130,6 @@ class db_connector:
                 """)
 
         for table1, table2 in itertools.permutations(("country", "cast", "director", "listed_in"), 2):
-            print(f"{table1}_per_{table2}")
             cur.execute(f"DROP VIEW IF EXISTS [{table1}_per_{table2}]")
             cur.execute(f"""
                 Create View [{table1}_per_{table2}] AS
@@ -372,6 +371,7 @@ class db_connector:
         cur.execute("""
                 SELECT type, count(type)
                 FROM show
+                GROUP BY type
                 """)
         return pd.DataFrame(cur.fetchall(),
                             columns=("type", "count"))
@@ -435,7 +435,7 @@ if __name__ == "__main__":
     #con.reset_database()
     #con.import_file("netflix_titles.csv")
     #con.export_csv()
-    test = con.get_countries_by_show("Houston, We Have a Problem!")
+    test = con.get_type_count()
     #test = con._db_connector__get_all("show_per_country")
     #test.columns = con.SHOW_COLUMNS + ["country"]
     #test = test[test["title"]=="Houston, We Have a Problem!"]
