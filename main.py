@@ -5,8 +5,8 @@ import folium
 import reader
 import plotly.express as px
 
-base_directory_johannes = "E:\\Programmieren\\Python\\Studieren\\Portfolio-Netflixdatenbank\\"
-base_directory = "D:\\Programme\\Microsoft Visual Studio Code\\Projects\\Python\\- DHBW\\Semester 2 - Portfolio\\Portfolio-Netflixdatenbank\\"
+base_directory = "E:\\Programmieren\\Python\\Studieren\\Portfolio-Netflixdatenbank\\"
+base_directory_alex = "D:\\Programme\\Microsoft Visual Studio Code\\Projects\\Python\\- DHBW\\Semester 2 - Portfolio\\Portfolio-Netflixdatenbank\\"
 
 def showmap():
     # geodata-source: https://geojson-maps.ash.ms/
