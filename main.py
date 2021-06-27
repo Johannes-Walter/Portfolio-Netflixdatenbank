@@ -5,12 +5,11 @@ import folium
 import reader
 import plotly.express as px
 
+base_directory = "E:\\Programmieren\\Python\\Studieren\\Portfolio-Netflixdatenbank\\"
 
 def showmap():
     # geodata-source: https://geojson-maps.ash.ms/
-    json1 = open(
-        r'C:\Users\darke\PycharmProjects\Portfolio-Netflixdatenbank\custom_geo.json',
-        'r')
+    json1 = open(base_directory + 'custom_geo.json', 'r')
     # Create a Map instance
     m = folium.Map(
         location=[
@@ -25,16 +24,14 @@ def showmap():
         max_zoom="10")
 
     choice = ["count"]
-
     # choice_selected = st.selectbox("Select choice", choice)
     # add chloropleth layer
     folium.Choropleth(
-        geo_path=json1,
-        geo_data=r'C:\Users\darke\PycharmProjects\Portfolio-Netflixdatenbank\custom_geo.json',
+        geo_data=base_directory + 'custom_geo.json',
         name="choropleth",
         data=con.get_shows_per_country(),
         columns=[
-            "country",
+            "name",
             choice[0]],
         key_on="feature.properties.name",
         fill_color="YlOrRd",
@@ -42,7 +39,7 @@ def showmap():
         line_opacity=0.1,
         legend_name=choice[0]).add_to(m)
     folium.features.GeoJson(
-        r'C:\Users\darke\PycharmProjects\Portfolio-Netflixdatenbank\custom_geo.json',
+        base_directory + 'custom_geo.json',
         name="Countries",
         smooth_factor=2.0,
         popup=folium.features.GeoJsonPopup(
@@ -52,8 +49,7 @@ def showmap():
 
 con = reader.db_connector()
 con.reset_database()
-con.import_file(
-    r"C:\Users\darke\PycharmProjects\Portfolio-Netflixdatenbank\netflix_titles.csv")
+con.import_file(base_directory + "netflix_titles.csv")
 
 st.set_page_config(layout="wide")
 
