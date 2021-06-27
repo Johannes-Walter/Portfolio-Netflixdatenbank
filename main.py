@@ -24,16 +24,15 @@ def showmap():
         max_zoom="10")
 
     choice = ["count"]
-
+    st.text(base_directory + 'custom_geo.json')
     # choice_selected = st.selectbox("Select choice", choice)
     # add chloropleth layer
     folium.Choropleth(
-        geo_path=json1,
         geo_data=base_directory + 'custom_geo.json',
         name="choropleth",
         data=con.get_shows_per_country(),
         columns=[
-            "country",
+            "name",
             choice[0]],
         key_on="feature.properties.name",
         fill_color="YlOrRd",
@@ -41,7 +40,7 @@ def showmap():
         line_opacity=0.1,
         legend_name=choice[0]).add_to(m)
     folium.features.GeoJson(
-        r'custom_geo.json',
+        base_directory + 'custom_geo.json',
         name="Countries",
         smooth_factor=2.0,
         popup=folium.features.GeoJsonPopup(
