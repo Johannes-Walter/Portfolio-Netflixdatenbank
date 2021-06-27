@@ -7,6 +7,7 @@
   2. Der Ordner-Pfad soll nun so aussehen: ,,C:/Portfolio-Netflixdatenbank/".
   3. Die Zip-Datei der Portfolio-Arbeit soll heruntergeladen und entpackt werden.
   4. Der Inhalt soll in den Ordner ,,Portfolio-Netflixdatenbank" verschoben werden.
+  5. Alternative: In der ,,main.py"-Datei kann der Ordnerpfad auch bei der Variable ,,base_directory" verändert werden.
 
 - Module/Libraries:
   - In der Datei ,,requirements.txt" sind die benötigten Module aufgelistet.
