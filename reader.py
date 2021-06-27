@@ -413,7 +413,7 @@ if __name__ == "__main__":
     #con.reset_database()
     #con.import_file("netflix_titles.csv")
     #con.export_csv()
-    test = con.get_types_per_cast()
+    test = con.get_shows_per_country()
     #test = con._db_connector__get_all("show_per_country")
     #test.columns = con.SHOW_COLUMNS + ["country"]
     #test = test[test["title"]=="Houston, We Have a Problem!"]
