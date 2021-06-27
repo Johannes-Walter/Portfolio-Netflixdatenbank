@@ -144,12 +144,25 @@ elif y == fragen[5]:
                                    int(min(con.get_all_shows()["release_year"].values)),
                                    int(max(con.get_all_shows()["release_year"].values)), (1970, 1980))
 
-        if slider:
+        x = ["Zeige nur Filme", "Zeige nur Serien", "Zeige Filme und Serien"]
+
+        select = st.sidebar.selectbox("Wählen Sie:", [i for i in x])
+        if select == x[0]:
+
+            years = con.get_type_count_per_year()[con.get_type_count_per_year()["type"] == "Movie"]
+        elif select == x[1]:
+
+            years = con.get_type_count_per_year()[con.get_type_count_per_year()["type"] == "TV Show"]
+
+        elif select == x[2]:
+
             years = con.get_type_count_per_year()
-            years = years[years['release_year'].between(slider[0], slider[1])]
-            fig = px.bar(years, x='release_year', y='count', labels={"release_year": "Jahr der Veröffentlichung",
-                                                                     "count": "Anzahl der Veröffentlichungen"})
-            bar_col.write(fig)
+
+            if slider:
+                years = years[years['release_year'].between(slider[0], slider[1])]
+                fig = px.bar(years, x='release_year', y='count', labels={"release_year": "Jahr der Veröffentlichung",
+                                                                         "count": "Anzahl der Veröffentlichungen"})
+                bar_col.write(fig)
 
     elif selection == selections[2]:
 
