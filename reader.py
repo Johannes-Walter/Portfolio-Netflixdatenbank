@@ -388,6 +388,7 @@ class db_connector:
                     SELECT [cast], type, count(type) count
                     FROM show_per_cast
                     GROUP BY [cast], type
+                    ORDER BY count(type) DESC
                     """)
         return pd.DataFrame(cur.fetchall(),
                             columns=("cast", "type", "count"))
