@@ -144,7 +144,7 @@ elif y == fragen[3]:
 elif y == fragen[4]:
     showmap()
     movies_per_country = con.get_shows_per_country()
-    st.write(movies_per_country.drop(index=0))
+    st.write(movies_per_country)
 
 elif y == fragen[5]:
 
@@ -153,7 +153,7 @@ elif y == fragen[5]:
         "Anzahl der Veröffentlichungen von Filmen/Serien pro Release Jahr",
         "Schauspieler mit den meisten Filmen/Serien"]
 
-    selection = st.selectbox("", [i for i in selections])
+    selection = st.selectbox("", selections)
 
     if selection == selections[0]:
 
@@ -170,7 +170,7 @@ elif y == fragen[5]:
 
         x = ["Zeige nur Filme", "Zeige nur Serien", "Zeige Filme und Serien"]
 
-        select = st.sidebar.selectbox("Wählen Sie:", [i for i in x])
+        select = st.sidebar.selectbox("Wählen Sie:", x)
         if select == x[0]:
 
             years = con.get_type_count_per_year()[con.get_type_count_per_year()["type"] == "Movie"]
