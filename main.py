@@ -6,6 +6,12 @@ import matplotlib.pyplot as plt
 import random
 import folium
 import reader
+import plotly.express as px
+
+
+def hard_reset():
+    con.reset_database()
+    con.import_file(r'C:\Users\darke\PycharmProjects\Portfolio-Netflixdatenbank\netflix_titles.csv')
 
 
 def showmap():
@@ -43,7 +49,7 @@ con.import_file(r"C:\Users\darke\PycharmProjects\Portfolio-Netflixdatenbank\netf
 
 st.set_page_config(layout="wide")
 
-
+st.button("Reset Database", hard_reset())
 
 hide_streamlit_style = """
             <style>
@@ -67,29 +73,37 @@ fragen = ["1. In welchen Filmen hat Schauspieler X gespielt?",
           "2. In welchen Filmen war X Regisseur?",
           "3. Welche Filme sind in der Kategorie X?",
           "4. Welche Filme sind zwischen Datum X und Y erschienen?",
-          "5. Wie viele Filme gibt es pro Land?"]
+          "5. Wie viele Filme gibt es pro Land?",
+          "6. Weitere Visualisierungen"]
 
 y = st.selectbox("Wähle aus", [i for i in fragen])
+
 if y == fragen[0]:
+
     z = st.text_input("Name des Schauspielers eingeben")
     if z:
         st.subheader(f"{z} hat in folgenden Filmen mitgespielt:")
         cast = con.get_shows_by_cast(z)[["title", "release_year"]]
         cast.index += 1
         st.write(cast)
+
 elif y == fragen[1]:
+
     z = st.text_input("Name des Regisseurs eingeben")
     if z:
         st.subheader(f"{z} hat bei folgenden Filmen Regie geführt:")
         directors = con.get_shows_by_director(z)["title"]
         directors.index += 1
         st.write(directors)
+
 elif y == fragen[2]:
+
     z = st.text_input("Bitte wählen Sie ein Genre aus (z.B. Action, Drama, etc...)")
     if z:
         st.subheader(f"Folgende Filme gehören zu dem Genre {z}:")
         genre = con.get_shows_by_listing(z)["title"]
         st.write(genre)
+
 elif y == fragen[3]:
 
     z = st.slider("Bitte wählen Sie den Zeitraum aus:", int(min(con.get_all_shows()["release_year"].values)),
@@ -99,9 +113,48 @@ elif y == fragen[3]:
         movies = con.get_all_shows()[["title", "release_year"]]
         movies = movies[movies['release_year'].between(z[0], z[1])]
         st.write(movies)
+
 elif y == fragen[4]:
     showmap()
     movies_per_country = con.get_shows_per_country()
     st.write(movies_per_country.drop(index=0))
 
-st.button("Reset Database", con.reset_database())
+elif y == fragen[5]:
+
+    selections = ["Anzahl Serien vs Anzahl Filme",
+                  "Anzahl der Veröffentlichungen von Filmen/Serien pro Release Jahr",
+                  "Schauspieler mit den meisten Filmen/Serien"]
+
+    selection = st.selectbox("", [i for i in selections])
+
+    if selection == selections[0]:
+
+        pie_col, x = st.beta_columns(2)
+
+        fig = px.pie(con.get_type_count(), values="count", names="type",
+                     color_discrete_sequence=px.colors.sequential.RdBu)
+        pie_col.write(fig)
+
+    elif selection == selections[1]:
+
+        st.sidebar.header("Filteroptionen")
+        bar_col, x = st.beta_columns(2)
+
+        slider = st.sidebar.slider("Bitte wählen Sie den Zeitraum aus:",
+                                   int(min(con.get_all_shows()["release_year"].values)),
+                                   int(max(con.get_all_shows()["release_year"].values)), (1970, 1980))
+
+        if slider:
+            years = con.get_type_count_per_year()
+            years = years[years['release_year'].between(slider[0], slider[1])]
+            fig = px.bar(years, x='release_year', y='count', labels={"release_year": "Jahr der Veröffentlichung",
+                                                                     "count": "Anzahl der Veröffentlichungen"})
+            bar_col.write(fig)
+
+    elif selection == selections[2]:
+
+        pie_col, x = st.beta_columns(2)
+
+        fig = px.pie(con.get_type_count(), values="count", names="type",
+                     color_discrete_sequence=px.colors.sequential.RdBu)
+        pie_col.write(fig)
